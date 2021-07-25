@@ -1,0 +1,30 @@
+const express = require("express");
+const router = express.Router();
+const axios = require("axios");
+
+router.get("/", async (req, res) => {
+  const city = req.query.city;
+
+  //if (city === null || city === undefined || city === "") {
+  if (!city) {
+    return res.status(400).send("Please provide city.");
+  }
+
+  try {
+    const url =
+      "http://api.openweathermap.org/data/2.5/weather?q=" +
+      city +
+      "&appid=46b24aec8d9d4f429b137b124c641d76";
+    const result = await axios.get(url);
+    res.status(200).send(result.data);
+  } catch (err) {
+    const errData = err.response.data;
+    if (errData.cod === "404") {
+      res.status(404).send(errData.message);
+    } else {
+      res.status(500).send("Something went wrong!");
+    }
+  }
+});
+
+module.exports = router;
